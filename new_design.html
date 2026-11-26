@@ -1,0 +1,256 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>THEO AI | Intelligent Studio</title>
+<style>
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    background: #080d19;
+    color: #f4f7ff;
+    font-family: Arial, sans-serif;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 7%;
+    background: #101a2b;
+    border-bottom: 1px solid #263651;
+}
+
+.logo {
+    font-size: 26px;
+    font-weight: 900;
+    background: linear-gradient(90deg,#00e5a0,#55aaff,#b56cff);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.status {
+    color: #00e5a0;
+    font-size: 13px;
+}
+
+main {
+    max-width: 1050px;
+    margin: auto;
+    padding: 35px 18px;
+}
+
+.hero {
+    text-align: center;
+    padding: 35px 10px;
+}
+
+.hero h1 {
+    font-size: 38px;
+    margin-bottom: 10px;
+}
+
+.hero span {
+    color: #42cfff;
+}
+
+.hero p {
+    color: #9baac2;
+}
+
+.panel {
+    background: #111d30;
+    border: 1px solid #293b58;
+    border-radius: 18px;
+    padding: 24px;
+    margin-bottom: 25px;
+    box-shadow: 0 10px 35px #0005;
+}
+
+h2 { font-size: 21px; }
+
+textarea, input {
+    width: 100%;
+    background: #080f1e;
+    border: 1px solid #344968;
+    border-radius: 12px;
+    padding: 15px;
+    color: white;
+    font-size: 15px;
+    outline: none;
+}
+
+textarea {
+    min-height: 115px;
+    resize: vertical;
+}
+
+textarea:focus, input:focus {
+    border-color: #35caff;
+}
+
+button {
+    border: none;
+    border-radius: 10px;
+    padding: 14px 22px;
+    margin-top: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #06101c;
+    background: linear-gradient(90deg,#00e5a0,#42cfff);
+}
+
+button:hover {
+    opacity: .85;
+}
+
+.image-result {
+    width: 100%;
+    max-width: 700px;
+    display: block;
+    margin: 22px auto 0;
+    border-radius: 14px;
+}
+
+.error {
+    color: #ff7777;
+    margin-top: 15px;
+}
+
+#chat-box {
+    height: 250px;
+    overflow-y: auto;
+    background: #080f1e;
+    border: 1px solid #263a58;
+    border-radius: 12px;
+    padding: 14px;
+    color: #dce8ff;
+}
+
+.message {
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 9px;
+    background: #172943;
+    overflow-wrap: anywhere;
+}
+
+footer {
+    text-align: center;
+    padding: 25px;
+    color: #71829e;
+    font-size: 13px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">✦ THEO AI</div>
+    <div class="status">● AI STUDIO ONLINE</div>
+</header>
+
+<main>
+
+<section class="hero">
+    <h1>Welcome to <span>THEO AI</span></h1>
+    <p>Your intelligent creative and AI assistant platform.</p>
+</section>
+
+<section class="panel">
+    <h2>🎨 AI Image Studio</h2>
+    <p style="color:#9baac2">
+        Turn your imagination into beautiful images.
+    </p>
+
+    <form method="POST">
+        <textarea name="prompt"
+        placeholder="Describe the image you want THEO AI to create..."
+        required>{{ prompt }}</textarea>
+        <button type="submit">✦ GENERATE IMAGE</button>
+    </form>
+
+    {% if error %}
+    <p class="error">{{ error }}</p>
+    {% endif %}
+
+    {% if image %}
+    <h3>Your generated artwork</h3>
+    <img class="image-result" src="{{ image }}" alt="Generated artwork">
+    {% endif %}
+</section>
+
+<section class="panel">
+    <h2>🤖 THEO AI Assistant</h2>
+    <p style="color:#9baac2">
+        Ask questions, explore ideas and get intelligent answers.
+    </p>
+
+    <div id="chat-box">
+        <div class="message">
+            <strong>THEO AI:</strong> Hello! Welcome to my studio. How can I help you?
+        </div>
+    </div>
+
+    <input id="chat-input"
+    placeholder="Ask THEO AI anything..."
+    autocomplete="off">
+
+    <button onclick="sendMessage()">SEND MESSAGE ➤</button>
+</section>
+
+</main>
+
+<footer>
+    © 2026 THEO AI Studio. Built with intelligence.
+</footer>
+
+<script>
+async function sendMessage() {
+    const input = document.getElementById("chat-input");
+    const box = document.getElementById("chat-box");
+    const message = input.value.trim();
+
+    if (!message) return;
+
+    function addMessage(label, content) {
+        const item = document.createElement("div");
+        item.className = "message";
+        const strong = document.createElement("strong");
+        strong.textContent = label + ": ";
+        item.appendChild(strong);
+        item.appendChild(document.createTextNode(content));
+        box.appendChild(item);
+        box.scrollTop = box.scrollHeight;
+    }
+
+    addMessage("YOU", message);
+    input.value = "";
+
+    try {
+        const response = await fetch("/chat", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({message: message})
+        });
+
+        const data = await response.json();
+        addMessage("THEO AI", data.reply || data.error || "No response.");
+    } catch (error) {
+        addMessage("THEO AI", "Connection failed. Please try again.");
+    }
+}
+
+document.getElementById("chat-input")
+.addEventListener("keydown", function(event) {
+    if (event.key === "Enter") sendMessage();
+});
+</script>
+
+</body>
+</html>
+
