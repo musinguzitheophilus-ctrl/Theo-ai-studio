@@ -5,7 +5,7 @@ import os
 import time
 import base64
 import requests
-from flask import Flask, request, render_template_string, url_for
+from flask import Flask, request, render_template_string, url_for, Response
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -17,6 +17,15 @@ API_TOKEN = os.getenv("CLOUDFLARE_API_TOKEN")
 
 HTML = open("new_design.html").read()
 
+@app.route("/sitemap.xml")
+def sitemap():
+    return Response(
+        '<?xml version="1.0" encoding="UTF-8"?>'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+        '<url><loc>https://theo-ai-studio.onrender.com/</loc></url>'
+        '</urlset>',
+        mimetype="application/xml"
+    )
 @app.route("/", methods=["GET", "POST"])
 def home():
     prompt = ""
