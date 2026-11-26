@@ -1,5 +1,8 @@
 .env
+.env.*
+.env.save
 __pycache__/
 *.pyc
 app_backup.py
 test_*.py
+static/generated_*.jpg

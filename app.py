@@ -1,4 +1,8 @@
+150
+150
+150
 import os
+import time
 import base64
 import requests
 from flask import Flask, request, render_template_string, url_for
@@ -145,10 +149,11 @@ def home():
                 image_bytes = base64.b64decode(encoded_image)
 
                 os.makedirs("static", exist_ok=True)
-                with open("static/generated.jpg", "wb") as f:
+                filename = f"generated_{int(time.time())}.jpg"
+                with open(os.path.join("static", filename), "wb") as f:
                     f.write(image_bytes)
 
-                image = url_for("static", filename="generated.jpg")
+                image = url_for("static", filename=filename)
 
             except Exception:
                 error = "Image generation failed. Check your internet and Cloudflare settings."
